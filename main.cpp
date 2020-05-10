@@ -36,21 +36,6 @@ char* TR_GetFullPathName(const char* path)
 }
 
 /**
-@brief CreateFromPathA()のラップ関数
-
-@return NULL:失敗, NULL以外:成功
-*/
-PIDLIST_ABSOLUTE TR_ILCreateFromPath(const char* path)
-{
-	try {
-		PIDLIST_ABSOLUTE pIdList = ILCreateFromPathA(path);
-		return pIdList;
-	} catch (...) {
-		return nullptr;
-	}
-}
-
-/**
 @brief ファイルやフォルダをWindowsのゴミ箱へ捨てる。
 
 @param path 絶対パス
@@ -61,7 +46,7 @@ int TR_ToTrash(const char* path)
 {
 	int rtn = 1;
 
-	PIDLIST_ABSOLUTE pIdList = TR_ILCreateFromPath(path);
+	PIDLIST_ABSOLUTE pIdList = ILCreateFromPathA(path);
 	if (pIdList == nullptr) {
 		LOG_ERR("path=%s", path);
 	} else {
