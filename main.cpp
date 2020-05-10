@@ -65,7 +65,11 @@ int TR_ToTrash(const char* path)
 				LOG_ERR("hr=%ld", hr);
 			} else {
 				// 操作のパラメータをセットする。
-				hr = pfo->SetOperationFlags(FOF_ALLOWUNDO);
+				hr = pfo->SetOperationFlags(
+					FOF_NOCONFIRMATION | // すべてのダイアログボックスで YES を選択する。
+					FOF_SILENT         | // 進捗ダイアログを表示しない。
+					FOFX_RECYCLEONDELETE // 削除時の代わりにゴミ箱へ移動する。
+				);
 				if (FAILED(hr)) {
 					LOG_ERR("hr=%ld", hr);
 				} else {
