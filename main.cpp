@@ -15,24 +15,28 @@
 #define LOG_ERR(fmt, ...)  LOG_XXX("ERR|" fmt, ##__VA_ARGS__)
 #define LOG_TRC(fmt, ...)  LOG_XXX("TRC|" fmt, ##__VA_ARGS__)
 
+#define LOGW_XXX(fmt, ...)  fwprintf(stderr, L"%-15.15s|%-15.15s|%-5d|" fmt L"\n", __FILEW__, __FUNCTIONW__, __LINE__, ##__VA_ARGS__);
+#define LOGW_ERR(fmt, ...)  LOGW_XXX("ERR|" fmt, ##__VA_ARGS__)
+#define LOGW_TRC(fmt, ...)  LOGW_XXX("TRC|" fmt, ##__VA_ARGS__)
+
 /**
 @brief 相対パスから絶対パスを作成する。
 */
-char* TR_GetFullPathName(const char* path)
+wchar_t* TR_GetFullPathName(const wchar_t* path)
 {
 	// 絶対パス格納に必要なサイズを取得する。
-	DWORD required_size = GetFullPathNameA(path, 0, NULL, NULL);
+	DWORD required_size = GetFullPathNameW(path, 0, NULL, NULL);
 	if (required_size == 0) {
 		LOG_ERR("GetLastError()=%lu", GetLastError());
 		return NULL;
 	}
-	char* buf = (char*)calloc(required_size, sizeof(char));
+	wchar_t* buf = (wchar_t*)calloc(required_size, sizeof(wchar_t));
 	if (buf == NULL) {
 		LOG_ERR("");
 		return NULL;
 	}
 	// 絶対パスを格納する。
-	DWORD ret = GetFullPathNameA(path, required_size, buf, NULL);
+	DWORD ret = GetFullPathNameW(path, required_size, buf, NULL);
 	if (ret == 0 || required_size <= ret) {
 		LOG_ERR("");
 		free(buf);
@@ -48,13 +52,13 @@ char* TR_GetFullPathName(const char* path)
 
 @return 0:成功, 0以外:失敗
 */
-int TR_ToTrash(const char* path)
+int TR_ToTrash(const wchar_t* path)
 {
 	int rtn = 1;
 
-	PIDLIST_ABSOLUTE pIdList = ILCreateFromPathA(path);
+	PIDLIST_ABSOLUTE pIdList = ILCreateFromPathW(path);
 	if (pIdList == nullptr) {
-		LOG_ERR("path=%s", path);
+		LOGW_ERR(L"path=%ls", path);
 	} else {
 		PCIDLIST_ABSOLUTE_ARRAY pIdlArray = &pIdList;
 		UINT itemNum = 1;
@@ -110,18 +114,18 @@ int TR_ToTrash(const char* path)
 	return rtn;
 }
 
-int main(int argc, char* argv[])
+int wmain(int argc, wchar_t* argv[])
 {
 	int ret = 0;
 	for (int i = 1; i < argc; i++) {
-		LOG_TRC("argv[i]=%s", argv[i]);
-		char* path = TR_GetFullPathName(argv[i]);
+		LOGW_TRC(L"argv[i]=%ls", argv[i]);
+		wchar_t* path = TR_GetFullPathName(argv[i]);
 		if (path == NULL) {
 			LOG_ERR("");
 			ret = 1;
 			break;
 		}
-		LOG_TRC("path=%s", path);
+		LOGW_TRC(L"path=%ls", path);
 		ret = TR_ToTrash(path);
 		free(path);
 		if (ret != 0) {
