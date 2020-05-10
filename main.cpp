@@ -56,32 +56,32 @@ int TR_ToTrash(const char* path)
 		// COMライブラリを初期化する。
 		HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 		if (FAILED(hr)) {
-			LOG_ERR("hr=%u", hr);
+			LOG_ERR("hr=%ld", hr);
 		} else {
 			// CLSID_FileOperationに関連付けられたオブジェクトを作成する。
 			IFileOperation* pfo;
 			hr = CoCreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pfo));
 			if (FAILED(hr)) {
-				LOG_ERR("hr=%u", hr);
+				LOG_ERR("hr=%ld", hr);
 			} else {
 				// 操作のパラメータをセットする。
 				hr = pfo->SetOperationFlags(FOF_ALLOWUNDO);
 				if (FAILED(hr)) {
-					LOG_ERR("hr=%u", hr);
+					LOG_ERR("hr=%ld", hr);
 				} else {
 					// ITEMIDLIST構造体のリストからシェルアイテム配列オブジェクトを作成する。
 					IShellItemArray* pShellItemArr = NULL;
 					hr = SHCreateShellItemArrayFromIDLists(itemNum, pIdlArray, &pShellItemArr);
 					if (FAILED(hr)) {
-						LOG_ERR("hr=%u", hr);
+						LOG_ERR("hr=%ld", hr);
 					} else {
 						hr = pfo->DeleteItems(pShellItemArr);
 						if (FAILED(hr)) {
-							LOG_ERR("hr=%u", hr);
+							LOG_ERR("hr=%ld", hr);
 						} else {
 							hr = pfo->PerformOperations();
 							if (FAILED(hr)) {
-								LOG_ERR("hr=%u", hr);
+								LOG_ERR("hr=%ld", hr);
 							} else {
 								rtn = 0;
 							}
