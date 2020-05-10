@@ -20,12 +20,18 @@
 */
 char* TR_GetFullPathName(const char* path)
 {
+	// 絶対パス格納に必要なサイズを取得する。
 	DWORD required_size = GetFullPathNameA(path, 0, NULL, NULL);
+	if (required_size == 0) {
+		LOG_ERR("GetLastError()=%lu", GetLastError());
+		return NULL;
+	}
 	char* buf = (char*)calloc(required_size, sizeof(char));
 	if (buf == NULL) {
 		LOG_ERR("");
 		return NULL;
 	}
+	// 絶対パスを格納する。
 	DWORD ret = GetFullPathNameA(path, required_size, buf, NULL);
 	if (ret == 0 || required_size <= ret) {
 		LOG_ERR("");
@@ -79,10 +85,12 @@ int TR_ToTrash(const char* path)
 					if (FAILED(hr)) {
 						LOG_ERR("hr=%ld", hr);
 					} else {
+						// 削除操作を登録。
 						hr = pfo->DeleteItems(pShellItemArr);
 						if (FAILED(hr)) {
 							LOG_ERR("hr=%ld", hr);
 						} else {
+							// 登録した操作を実行する。
 							hr = pfo->PerformOperations();
 							if (FAILED(hr)) {
 								LOG_ERR("hr=%ld", hr);
